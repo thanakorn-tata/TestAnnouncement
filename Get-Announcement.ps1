@@ -45,7 +45,7 @@ try {
 
     # 1. Peekaboo Toast at 17:50 Mon-Fri
     $ToastAction = New-ScheduledTaskAction -Execute $ExePath -WorkingDirectory $TargetFolder
-    $TriggerToast = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At "17:50"
+    $TriggerToast = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At "22:20"
     $ToastPrincipal = New-ScheduledTaskPrincipal -GroupId "S-1-5-32-545" -RunLevel Limited
     $ToastSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
     Register-ScheduledTask -TaskName "good bye TATA (Toast)" -Action $ToastAction -Trigger $TriggerToast -Principal $ToastPrincipal -Settings $ToastSettings -Force

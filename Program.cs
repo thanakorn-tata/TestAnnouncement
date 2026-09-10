@@ -16,7 +16,7 @@ namespace Announcement
         [DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern int SetCurrentProcessExplicitAppUserModelID(string appID);
 
-        private static readonly string _logDir = @"C:\Downloadpath\Notification";
+        private static readonly string _logDir = @"C:\Downloadpath\NotificationTATA";
 
         /// <summary>
         /// Writes message traces into local debug logs.
