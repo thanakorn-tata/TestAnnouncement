@@ -1,13 +1,15 @@
 using System;
 using System.Drawing;
-using System.IO;
+using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.Windows.Forms;
+using Announcement.Repositories;
 
 namespace Announcement.UI
 {
     /// <summary>
-    /// Displays a fullscreen borderless window containing energy saving campaign alerts.
-    /// Supports dynamic artwork loading or placeholders fallback.
+    /// Displays a fullscreen borderless farewell message with a gradient background.
+    /// All text is rendered in the Paint event for proper transparency over the gradient.
     /// </summary>
     public class MainPopupForm : Form
     {
@@ -18,46 +20,27 @@ namespace Announcement.UI
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.StartPosition = FormStartPosition.Manual;
-            this.Text = "Announcement";
+            this.Text = "ลาก่อนนะครับ";
             this.ShowInTaskbar = true;
             this.TopMost = true;
+            this.DoubleBuffered = true;
 
             // Fit form to screen dimensions
             Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
             this.Bounds = screenBounds;
             this.WindowState = FormWindowState.Maximized;
 
-            // Attempt to load background artwork image
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            string imagePath = Path.Combine(baseDir, "MainPopup.png");
-
-            if (File.Exists(imagePath))
-            {
-                try
-                {
-                    this.BackgroundImage = Image.FromFile(imagePath);
-                    this.BackgroundImageLayout = ImageLayout.Stretch;
-                }
-                catch (Exception ex)
-                {
-                    ShowPlaceholder($"Error loading Artwork: {ex.Message}");
-                }
-            }
-            else
-            {
-                ShowPlaceholder("Waiting for Artwork (1920x1080)");
-            }
-
-            // Close Button (X) placed at top-right corner
+            // Close Button (✕) placed at top-right corner
             Button closeBtn = new Button();
             closeBtn.Text = "✕";
             closeBtn.Font = new Font("Segoe UI", 16, FontStyle.Bold);
-            closeBtn.ForeColor = Color.White;
-            closeBtn.BackColor = Color.FromArgb(80, 0, 0, 0);
+            closeBtn.ForeColor = Color.FromArgb(200, 255, 255, 255);
+            closeBtn.BackColor = Color.FromArgb(50, 255, 255, 255);
             closeBtn.FlatStyle = FlatStyle.Flat;
             closeBtn.FlatAppearance.BorderSize = 0;
-            closeBtn.Size = new Size(45, 45);
-            closeBtn.Location = new Point(screenBounds.Width - 55, 10);
+            closeBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(100, 255, 255, 255);
+            closeBtn.Size = new Size(50, 50);
+            closeBtn.Location = new Point(screenBounds.Width - 65, 15);
             closeBtn.Cursor = Cursors.Hand;
             closeBtn.Click += (s, e) => this.Close();
             this.Controls.Add(closeBtn);
@@ -82,20 +65,72 @@ namespace Announcement.UI
             };
         }
 
-        /// <summary>
-        /// Displays placeholder label if image asset is not found.
-        /// </summary>
-        private void ShowPlaceholder(string message)
+        protected override void OnPaint(PaintEventArgs e)
         {
-            this.BackColor = Color.FromArgb(24, 24, 24); // Dark theme layout
+            base.OnPaint(e);
+            Graphics g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 
-            Label lbl = new Label();
-            lbl.Text = message;
-            lbl.Font = new Font("Segoe UI", 24, FontStyle.Bold);
-            lbl.ForeColor = Color.FromArgb(120, 120, 120);
-            lbl.TextAlign = ContentAlignment.MiddleCenter;
-            lbl.Dock = DockStyle.Fill;
-            this.Controls.Add(lbl);
+            int w = this.ClientSize.Width;
+            int h = this.ClientSize.Height;
+
+            // --- Gradient Background (dark blue-purple) ---
+            using (LinearGradientBrush bgBrush = new LinearGradientBrush(
+                this.ClientRectangle,
+                Color.FromArgb(12, 15, 40),
+                Color.FromArgb(35, 20, 55),
+                LinearGradientMode.Vertical))
+            {
+                g.FillRectangle(bgBrush, this.ClientRectangle);
+            }
+
+            // Subtle decorative circle glow (center)
+            int glowSize = Math.Min(w, h) / 2;
+            using (GraphicsPath path = new GraphicsPath())
+            {
+                path.AddEllipse(w / 2 - glowSize / 2, h / 2 - glowSize / 2, glowSize, glowSize);
+                using (PathGradientBrush glowBrush = new PathGradientBrush(path))
+                {
+                    glowBrush.CenterColor = Color.FromArgb(18, 80, 100, 180);
+                    glowBrush.SurroundColors = new Color[] { Color.FromArgb(0, 30, 30, 60) };
+                    g.FillPath(glowBrush, path);
+                }
+            }
+
+            StringFormat sf = new StringFormat
+            {
+                Alignment = StringAlignment.Center,
+                LineAlignment = StringAlignment.Center
+            };
+
+            // --- Wave Emoji ---
+            int emojiY = (int)(h * 0.18);
+            using (Font emojiFont = new Font("Segoe UI Emoji", 52))
+            using (SolidBrush emojiBrush = new SolidBrush(Color.White))
+            {
+                g.DrawString("\U0001f44b", emojiFont, emojiBrush,
+                    new RectangleF(0, emojiY, w, 80), sf);
+            }
+
+            // --- Main Farewell Message ---
+            int msgTop = (int)(h * 0.30);
+            int msgHeight = (int)(h * 0.40);
+            using (Font msgFont = new Font("Segoe UI", 24, FontStyle.Regular))
+            using (SolidBrush msgBrush = new SolidBrush(Color.FromArgb(235, 238, 245)))
+            {
+                RectangleF textRect = new RectangleF(80, msgTop, w - 160, msgHeight);
+                g.DrawString(MessageRepository.FarewellMessage, msgFont, msgBrush, textRect, sf);
+            }
+
+            // --- Signature ---
+            int sigY = (int)(h * 0.76);
+            using (Font sigFont = new Font("Segoe UI", 20, FontStyle.Italic))
+            using (SolidBrush sigBrush = new SolidBrush(Color.FromArgb(140, 150, 175)))
+            {
+                g.DrawString("— ตาต้า", sigFont, sigBrush,
+                    new RectangleF(0, sigY, w, 50), sf);
+            }
         }
     }
 }

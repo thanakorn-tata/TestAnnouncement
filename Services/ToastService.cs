@@ -21,15 +21,16 @@ namespace Announcement.Services
         /// Shows a sticky UWP Toast Notification (using IncomingCall template)
         /// that remains on the user's screen and auto-expires after a set duration.
         /// </summary>
-        /// <param name="body">Thai alert message string details.</param>
+        /// <param name="title">Bold title line of the toast.</param>
+        /// <param name="body">Body message text.</param>
         /// <param name="clearAfterMinutes">Time span in minutes before auto-expiry.</param>
-        public void ShowStickyToast(string body, double clearAfterMinutes = 2.0)
+        public void ShowStickyToast(string title, string body, double clearAfterMinutes = 2.0)
         {
             try
             {
                 var builder = new ToastContentBuilder()
                     .AddArgument("action", "announcement")
-                    .AddText("One Switch , Big Impact")
+                    .AddText(title)
                     .AddText(body);
 
                 // Configure ToastScenario.IncomingCall to make it stick to the screen,

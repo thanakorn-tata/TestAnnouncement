@@ -34,6 +34,11 @@ namespace Announcement
 
         /// <summary>
         /// Main entry point for the Announcement application.
+        /// 
+        /// Flow:
+        ///   1. --startup flag  →  Show farewell popup ONCE (tracked by LastPopupDate.txt existence)
+        ///   2. No flag         →  Show peekaboo toast notification
+        ///   3. Campaign lasts ~3 days from StartDate.txt, then auto-stops.
         /// </summary>
         [STAThread]
         static void Main(string[] args)
@@ -55,10 +60,10 @@ namespace Announcement
                 DateTime now = DateTime.Parse(nowRaw.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
                 Log($"Current DateTime (Forced AD): {now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)}, DayOfWeek: {now.DayOfWeek}");
 
-                // --- (First Date Configuration) ---
+                // --- Parse Start Date ---
                 string baseDir = AppDomain.CurrentDomain.BaseDirectory;
                 string dateFile = Path.Combine(baseDir, "StartDate.txt");
-                
+
                 DateTime installDate;
                 if (File.Exists(dateFile))
                 {
@@ -96,20 +101,25 @@ namespace Announcement
                     Log($"StartDate not found, using today (AD): {installDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}");
                 }
 
+                // Guard: Not yet started
                 if (now.Date < installDate)
                 {
                     Log($"EXIT: now.Date ({now.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}) < installDate ({installDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)})");
                     return;
                 }
 
-                // Guard: Bypass alerts on Weekends
-                if (now.DayOfWeek == DayOfWeek.Saturday || now.DayOfWeek == DayOfWeek.Sunday)
+                // Campaign duration: active for ~3 days from install date
+                double daysSinceInstall = (now.Date - installDate).TotalDays;
+                bool isCampaignActive = daysSinceInstall <= 3;
+                Log($"daysSinceInstall: {daysSinceInstall}, isCampaignActive: {isCampaignActive}");
+
+                if (!isCampaignActive)
                 {
-                    Log($"EXIT: Weekend ({now.DayOfWeek})");
+                    Log("EXIT: Campaign ended (past 3 days)");
                     return;
                 }
 
-                // Parse startup popup parameters
+                // Parse startup popup parameter
                 bool isStartupPopup = false;
                 if (args != null)
                 {
@@ -123,55 +133,20 @@ namespace Announcement
                     }
                 }
 
-                // Campaign duration config: active until 2026-10-31
-                double daysSinceInstall = (now.Date - installDate).TotalDays;
-                bool isCampaignActive = now.Date <= new DateTime(2026, 10, 31);
-                bool isFirstWeek = daysSinceInstall < 7;
-                Log($"isStartupPopup: {isStartupPopup}, isCampaignActive: {isCampaignActive}, isFirstWeek: {isFirstWeek}, daysSinceInstall: {daysSinceInstall}");
+                Log($"isStartupPopup: {isStartupPopup}");
 
-                // Guard: Exit if the campaign duration has ended
-                if (!isCampaignActive)
-                {
-                    Log("EXIT: Campaign ended (past 2026-10-31), no action taken");
-                    return;
-                }
-
-                // Fullscreen Popup Flow
+                // === Farewell Popup Flow (--startup) ===
                 if (isStartupPopup)
                 {
-                    if (now.Hour < 6)
-                    {
-                        Log($"EXIT: Hour ({now.Hour}) < 6");
-                        return;
-                    }
-
-                    // Check if popup alert was already displayed today
+                    // Show farewell popup ONCE ever (not once per day — just once)
                     string popupTrackFile = Path.Combine(baseDir, "LastPopupDate.txt");
-                    string todayStr = now.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                    
-                    bool alreadyShown = false;
-                    if (File.Exists(popupTrackFile))
-                    {
-                        try
-                        {
-                            string lastDate = File.ReadAllText(popupTrackFile).Trim();
-                            if (lastDate == todayStr)
-                            {
-                                alreadyShown = true;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Log($"Error reading LastPopupDate: {ex.Message}");
-                        }
-                    }
 
-                    if (!alreadyShown)
+                    if (!File.Exists(popupTrackFile))
                     {
-                        Log("Popup not yet shown today, writing track file and launching popup");
+                        Log("First time — showing farewell popup");
                         try
                         {
-                            File.WriteAllText(popupTrackFile, todayStr);
+                            File.WriteAllText(popupTrackFile, now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
                         }
                         catch (Exception ex)
                         {
@@ -184,43 +159,23 @@ namespace Announcement
                     }
                     else
                     {
-                        Log("EXIT: Popup already shown today");
+                        Log("EXIT: Farewell popup already shown");
                     }
                     return;
                 }
 
-                // Toast Notification Flow (Noon & Evening schedules)
-                int idx = (int)now.DayOfWeek - 1;
-                if (idx < 0)
-                {
-                    idx = 0;
-                }
-                int maxIdx = MessageRepository.CasualNoonMessages.Length - 1;
-                int dayIndex = Math.Min(idx, maxIdx);
-
-                // Run noon templates before 3:00 PM, otherwise default to evening templates
-                bool isNoon = now.Hour < 15;
-                Log($"Toast branch: isNoon={isNoon}, dayIndex={dayIndex}, isFirstWeek={isFirstWeek}");
-
-                string body;
-                if (isFirstWeek)
-                {
-                    body = isNoon ? MessageRepository.FormalNoonMessage : MessageRepository.FormalEveningMessage;
-                }
-                else
-                {
-                    body = isNoon ? MessageRepository.CasualNoonMessages[dayIndex] : MessageRepository.CasualEveningMessages[dayIndex];
-                }
-                Log($"Toast body: {body.Substring(0, Math.Min(body.Length, 80))}...");
+                // === Peekaboo Toast Flow (17:50 scheduled) ===
+                Log($"Toast: title={MessageRepository.ToastTitle}, body={MessageRepository.ToastBody}");
 
                 double clearMin = AppSettingsManager.ClearAfterMinutes;
                 Log($"ClearAfterMinutes: {clearMin}");
 
                 var svc = new ToastService(appId);
-                svc.ShowStickyToast(body, clearMin);
+                svc.ShowStickyToast(MessageRepository.ToastTitle, MessageRepository.ToastBody, clearMin);
             }
             catch (Exception ex)
             {
+                Console.Error.WriteLine($"UNHANDLED EXCEPTION: {ex}");
                 Log($"UNHANDLED EXCEPTION: {ex}");
                 try
                 {

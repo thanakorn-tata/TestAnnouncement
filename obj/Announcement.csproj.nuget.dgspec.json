@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Scripts\\WIND\\Project\\announcement\\Announcement.csproj": {}
+    "c:\\Users\\thana\\TestAnnouncement\\Announcement.csproj": {}
   },
   "projects": {
-    "D:\\Scripts\\WIND\\Project\\announcement\\Announcement.csproj": {
+    "c:\\Users\\thana\\TestAnnouncement\\Announcement.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Scripts\\WIND\\Project\\announcement\\Announcement.csproj",
+        "projectUniqueName": "c:\\Users\\thana\\TestAnnouncement\\Announcement.csproj",
         "projectName": "Announcement",
-        "projectPath": "D:\\Scripts\\WIND\\Project\\announcement\\Announcement.csproj",
-        "packagesPath": "D:\\Users\\gbl.thanakorn.k\\.nuget\\packages\\",
-        "outputPath": "D:\\Scripts\\WIND\\Project\\announcement\\obj\\",
+        "projectPath": "c:\\Users\\thana\\TestAnnouncement\\Announcement.csproj",
+        "packagesPath": "C:\\Users\\thana\\.nuget\\packages\\",
+        "outputPath": "c:\\Users\\thana\\TestAnnouncement\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "D:\\Users\\gbl.thanakorn.k\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\thana\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0-windows10.0.17763.0"
@@ -65,15 +65,15 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.30, 8.0.30]"
+              "version": "[8.0.31, 8.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[8.0.30, 8.0.30]"
+              "version": "[8.0.31, 8.0.31]"
             },
             {
               "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.30, 8.0.30]"
+              "version": "[8.0.31, 8.0.31]"
             },
             {
               "name": "Microsoft.Windows.SDK.NET.Ref",
@@ -81,7 +81,7 @@
             },
             {
               "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.30, 8.0.30]"
+              "version": "[8.0.31, 8.0.31]"
             }
           ],
           "frameworkReferences": {
@@ -95,7 +95,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json"
         }
       },
       "runtimes": {
