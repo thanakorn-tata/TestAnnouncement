@@ -1,0 +1,67 @@
+================================================================================
+HANDOVER DOCUMENTATION: ENERGY SAVING ANNOUNCEMENT MODULE (energysavingalert)
+================================================================================
+
+1. ภาพรวมและวัตถุประสงค์ (Overview)
+--------------------------------------------------------------------------------
+Announcement (Energy Saving Campaign / energysavingalert) เป็นยูทิลิตี้แจ้งเตือน
+โครงการประหยัดพลังงานในองค์กร ("One Switch, Big Impact") รณรงค์ให้พนักงานปิดคอมพิวเตอร์
+ปิดไฟ ปิดเครื่องปรับอากาศ และถอดปลั๊กก่อนพักเที่ยงและหลังเลิกงาน
+
+การแสดงผลแบ่งออกเป็น 2 รูปแบบหลัก:
+1. Fullscreen Popup: แสดงรูปภาพโปสเตอร์รณรงค์ขนาดเต็มจอ (MainPopup.png) ในช่วงเช้า/Logon
+2. Sticky Toast Notification: แสดงการ์ดแจ้งเตือนแบบปักหมุดค้างผ่าน Windows 10/11 UWP Toast Notification 
+   ในช่วงพักเที่ยง (12:00 น.) และเลิกงาน (18:00 น.)
+
+2. สถาปัตยกรรมและโครงสร้างโค้ด (Architecture & Key Files)
+--------------------------------------------------------------------------------
+- Framework: .NET 8.0 Windows Desktop (win-x64 Self-Contained)
+- Toast Engine: Microsoft.Toolkit.Uwp.Notifications (AppUserModelId: "EnergySavingAlertApp")
+- Deployment Target: C:\Downloadpath\Notification\
+- Deploy Package: EnergySavingAlert_Package.zip
+
+โครงสร้างไฟล์สำคัญ:
+- Configuration/AppSettingsManager.cs : กำหนดค่า AppUserModelId และระยะเวลาเคลียร์ Toast (ClearAfterMinutes = 2.0)
+- Repositories/MessageRepository.cs    : จัดเก็บข้อความแจ้งเตือนภาษาไทย (แบบทางการสำหรับสัปดาห์แรก และแบบสุ่มเป็นกันเองสำหรับสัปดาห์ที่ 2-4)
+- Services/ToastService.cs            : ส่ง UWP Toast Notification รูปแบบ IncomingCall (ปักหมุดค้างพร้อมตั้งเวลา ExpirationTime)
+- Services/ShortcutService.cs         : สร้าง Shell Shortcut ("Energy Saving Alert !.lnk") บน Start Menu พร้อมฝัง AppUserModelID COM Property
+- UI/MainPopupForm.cs                  : หน้าต่างแสดงภาพโปสเตอร์ MainPopup.png แบบเต็มจอ (Maximized Borderless) พร้อมปุ่มปิด (✕) และปุ่ม ESC
+- Program.cs                           : จุดเริ่มต้นโปรแกรม ตรวจสอบวันที่เริ่มแคมเปญ (StartDate.txt), ข้ามวันเสาร์-อาทิตย์,
+                                         ตรวจสอบวันหมดอายุแคมเปญ (31 ส.ค. 2026) และเลือกโหมดแสดงผล
+
+3. ลำดับตรรกะการทำงาน (Execution Workflow)
+--------------------------------------------------------------------------------
+1. Startup Fullscreen Popup Mode (เมื่อเรียกพร้อมพารามิเตอร์ `--startup`):
+   - ระบบจะตรวจเช็ควันปัจจุบันกับ StartDate.txt
+   - ตรวจเช็คไฟล์ LastPopupDate.txt เพื่อให้มั่นใจว่าเด้งโปสเตอร์เต็มจอเพียง 1 ครั้งต่อวันเท่านั้น
+   - บันทึก LastPopupDate.txt และเปิดหน้าต่าง MainPopupForm
+
+2. Scheduled Toast Notification Mode (ช่วงพักเที่ยง 12:00 น. และ เลิกงาน 18:00 น.):
+   - ตรวจสอบว่าอยู่ในสัปดาห์แรกของแคมเปญหรือไม่ (สัปดาห์แรกใช้ข้อความทางการ / สัปดาห์ที่ 2+ ใช้ข้อความสลับตามวัน)
+   - ส่ง Toast Notification ผ่าน Windows Notification Center
+
+4. ขั้นตอนการคอมไพล์และสร้างแพ็กเกจ (Build & Package Instructions)
+--------------------------------------------------------------------------------
+1. เปิด Command Prompt / PowerShell ไปยังโฟลเดอร์โครงการ:
+   d:\Users\gbl.intouch.c\Project\announcement\
+2. รันคำสั่งบิลด์แพ็กเกจ:
+   build_and_package.bat
+3. ระบบจะทำการ Publish และบีบอัดไฟล์ทั้งหมดออกเป็น:
+   - bin\Release\net8.0-windows10.0.17763.0\win-x64\publish\EnergySavingAlert_Package.zip
+
+5. ขั้นตอนการนำไปใช้ติดตั้ง (Deployment & Task Scheduler Setup)
+--------------------------------------------------------------------------------
+1. สคริปต์ติดตั้งใช้งานจริง: Get-Announcement.ps1
+   - คลายไฟล์ Zip ไปยัง: C:\Downloadpath\Notification\
+   - สร้างไฟล์ StartDate.txt ระบุวันที่เริ่มแคมเปญ
+   - กำหนดสิทธิ์โฟลเดอร์ icacls ให้กลุ่ม Users
+   - ลงทะเบียน Windows Scheduled Tasks 3 งาน:
+     * EnergySavingAlert: รัน จันทร์-ศุกร์ เวลา 12:00 น. และ 18:00 น.
+     * EnergySavingPopup_Logon: รันเมื่อ User Logon (พารามิเตอร์ --startup)
+     * EnergySavingPopup_Daily: รันทุกวัน เวลา 06:00 น. (พารามิเตอร์ --startup)
+
+================================================================================
+ข้อควรระวังสำหรับผู้รับช่วงต่องาน:
+- เมื่อต้องการเปลี่ยนภาพโปสเตอร์เต็มจอ ให้เปลี่ยนไฟล์ MainPopup.png ในโฟลเดอร์โครงการ
+- วันหมดอายุแคมเปญถูกตั้งไว้ที่ 31 สิงหาคม 2026 ใน Program.cs (บรรทัดที่ 128)
+================================================================================
