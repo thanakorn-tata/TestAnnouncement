@@ -1,0 +1,9 @@
+D:\Users\gbl.intouch.c\project\announcement\bin\Release\net8.0-windows10.0.17763.0\win-x64\publish\Announcement.exe
+D:\Users\gbl.intouch.c\project\announcement\bin\Release\net8.0-windows10.0.17763.0\win-x64\publish\Designer.ico
+D:\Users\gbl.intouch.c\project\announcement\bin\Release\net8.0-windows10.0.17763.0\win-x64\publish\Announcement.dll
+D:\Users\gbl.intouch.c\project\announcement\bin\Release\net8.0-windows10.0.17763.0\win-x64\publish\Announcement.deps.json
+D:\Users\gbl.intouch.c\project\announcement\bin\Release\net8.0-windows10.0.17763.0\win-x64\publish\Announcement.runtimeconfig.json
+D:\Users\gbl.intouch.c\project\announcement\bin\Release\net8.0-windows10.0.17763.0\win-x64\publish\Announcement.pdb
+D:\Users\gbl.intouch.c\project\announcement\bin\Release\net8.0-windows10.0.17763.0\win-x64\publish\Microsoft.Windows.SDK.NET.dll
+D:\Users\gbl.intouch.c\project\announcement\bin\Release\net8.0-windows10.0.17763.0\win-x64\publish\WinRT.Runtime.dll
+D:\Users\gbl.intouch.c\project\announcement\bin\Release\net8.0-windows10.0.17763.0\win-x64\publish\Microsoft.Toolkit.Uwp.Notifications.dll
