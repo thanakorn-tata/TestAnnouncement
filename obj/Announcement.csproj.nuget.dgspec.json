@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Scripts\\TATA\\TestAnnouncement\\Announcement.csproj": {}
+    "C:\\Users\\thana\\TestAnnouncement\\Announcement.csproj": {}
   },
   "projects": {
-    "D:\\Scripts\\TATA\\TestAnnouncement\\Announcement.csproj": {
+    "C:\\Users\\thana\\TestAnnouncement\\Announcement.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Scripts\\TATA\\TestAnnouncement\\Announcement.csproj",
+        "projectUniqueName": "C:\\Users\\thana\\TestAnnouncement\\Announcement.csproj",
         "projectName": "Announcement",
-        "projectPath": "D:\\Scripts\\TATA\\TestAnnouncement\\Announcement.csproj",
-        "packagesPath": "D:\\Users\\gbl.thanakorn.k\\.nuget\\packages\\",
-        "outputPath": "D:\\Scripts\\TATA\\TestAnnouncement\\obj\\",
+        "projectPath": "C:\\Users\\thana\\TestAnnouncement\\Announcement.csproj",
+        "packagesPath": "C:\\Users\\thana\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\thana\\TestAnnouncement\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "D:\\Users\\gbl.thanakorn.k\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\thana\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0-windows10.0.17763.0"
@@ -64,24 +64,8 @@
           "warn": true,
           "downloadDependencies": [
             {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.30, 8.0.30]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[8.0.30, 8.0.30]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.30, 8.0.30]"
-            },
-            {
               "name": "Microsoft.Windows.SDK.NET.Ref",
               "version": "[10.0.17763.57, 10.0.17763.57]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.30, 8.0.30]"
             }
           ],
           "frameworkReferences": {
@@ -95,7 +79,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json"
         }
       },
       "runtimes": {

@@ -7,7 +7,7 @@ if (!$ScriptPath) { $ScriptPath = Get-Location }
 $InnerZipName = "Announcement.zip" 
 $InnerZipPath = Join-Path $ScriptPath $InnerZipName
 
-$TargetFolder = "C:\Downloadpath\Notification"
+$TargetFolder = "C:\Downloadpath\NotificationTATA"
 $ExePath = Join-Path $TargetFolder "Announcement.exe"
 
 try {

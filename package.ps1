@@ -34,7 +34,7 @@ New-Item -ItemType Directory -Path $packageDir | Out-Null
 Copy-Item (Join-Path $rootDir "Get-Announcement.ps1") (Join-Path $packageDir "Get-Announcement.ps1") -Force
 Copy-Item $innerZipPath (Join-Path $packageDir "Announcement.zip") -Force
 
-$outerZipPath = Join-Path $publishDir "EnergySavingAlert_Package.zip"
+$outerZipPath = Join-Path $publishDir "goodbye_tata.zip"
 if (Test-Path $outerZipPath) { Remove-Item $outerZipPath -Force }
 Compress-Archive -Path (Join-Path $packageDir "*") -DestinationPath $outerZipPath -Force
 Remove-Item $packageDir -Recurse -Force
@@ -52,7 +52,7 @@ if (Test-Path $testScriptPath) {
 }
 Copy-Item $innerZipPath (Join-Path $testPackageDir "Announcement.zip") -Force
 
-$testOuterZipPath = Join-Path $publishDir "EnergySavingAlert_Test_Package.zip"
+$testOuterZipPath = Join-Path $publishDir "goodbye_tata_test.zip"
 if (Test-Path $testOuterZipPath) { Remove-Item $testOuterZipPath -Force }
 Compress-Archive -Path (Join-Path $testPackageDir "*") -DestinationPath $testOuterZipPath -Force
 Remove-Item $testPackageDir -Recurse -Force

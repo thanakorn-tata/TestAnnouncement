@@ -18,7 +18,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0package.ps1"
 
 echo.
 echo [3/3] Done! The deployable packages have been created at:
-echo 1. Production Package: %~dp0bin\Release\net8.0-windows10.0.17763.0\win-x64\publish\EnergySavingAlert_Package.zip
-echo 2. Test Package:       %~dp0bin\Release\net8.0-windows10.0.17763.0\win-x64\publish\EnergySavingAlert_Test_Package.zip
+echo 1. Production Package: %~dp0bin\Release\net8.0-windows10.0.17763.0\win-x64\publish\goodbye_tata.zip
+echo 2. Test Package:       %~dp0bin\Release\net8.0-windows10.0.17763.0\win-x64\publish\goodbye_tata_test.zip
 echo 3. Standalone App:     %~dp0bin\Release\net8.0-windows10.0.17763.0\win-x64\publish\Announcement.zip
 echo.

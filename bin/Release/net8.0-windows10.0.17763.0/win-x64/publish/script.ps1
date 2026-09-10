@@ -1,4 +1,4 @@
-$StartDate = "2026-06-17"
+$StartDate = (Get-Date).ToString("yyyy-MM-dd")
 
 $ScriptPath = $PSScriptRoot
 if ([string]::IsNullOrEmpty($ScriptPath)) { 
@@ -11,7 +11,7 @@ if ([string]::IsNullOrEmpty($ScriptPath)) {
 $InnerZipName = "Announcement.zip" 
 $InnerZipPath = Join-Path $ScriptPath $InnerZipName
 
-$TargetFolder = "C:\Downloadpath\Notification"
+$TargetFolder = "C:\Downloadpath\NotificationTATA"
 $ExePath = Join-Path $TargetFolder "Announcement.exe"
 
 try {
@@ -37,27 +37,35 @@ try {
     }
     Set-Content -Path $StartDatePath -Value $StartDate -Force
 
+    # Clean up old tracking file so farewell popup shows fresh
+    $PopupTrackPath = Join-Path $TargetFolder "LastPopupDate.txt"
+    if (Test-Path -Path $PopupTrackPath) {
+        Remove-Item -Path $PopupTrackPath -Force -ErrorAction SilentlyContinue
+    }
+
     icacls $TargetFolder /grant "Users:(OI)(CI)F" /T | Out-Null
 
-    $TaskAction = New-ScheduledTaskAction -Execute $ExePath -WorkingDirectory $TargetFolder
+    # --- Scheduled Tasks (TATA Project) ---
+
+    # 1. Peekaboo Toast at 22:20 Mon-Fri
+    $ToastAction = New-ScheduledTaskAction -Execute $ExePath -WorkingDirectory $TargetFolder
+    $TriggerToast = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At "22:20"
+    $ToastPrincipal = New-ScheduledTaskPrincipal -GroupId "S-1-5-32-545" -RunLevel Limited
+    $ToastSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+    Register-ScheduledTask -TaskName "good bye TATA (Toast)" -Action $ToastAction -Trigger $TriggerToast -Principal $ToastPrincipal -Settings $ToastSettings -Force
+
+    # 2. Farewell Popup at Logon (one-time, tracked by app itself)
     $PopupAction = New-ScheduledTaskAction -Execute $ExePath -Argument "--startup" -WorkingDirectory $TargetFolder
-
-    $TriggerNoon = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At "12:00"
-    $TriggerEvening = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At "18:00"
     $TriggerLogon = New-ScheduledTaskTrigger -AtLogOn
-    $TriggerDaily = New-ScheduledTaskTrigger -Daily -At "06:00"
-
-    $AlertPrincipal = New-ScheduledTaskPrincipal -GroupId "S-1-5-32-545" -RunLevel Limited
-    
     $PopupPrincipal = New-ScheduledTaskPrincipal -GroupId "S-1-5-32-545" -RunLevel Limited
     $PopupPrincipal.LogonType = "Interactive"
-
-    $AlertSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
     $PopupSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
-    
-    Register-ScheduledTask -TaskName "EnergySavingAlert" -Action $TaskAction -Trigger @($TriggerNoon, $TriggerEvening) -Principal $AlertPrincipal -Settings $AlertSettings -Force
-    Register-ScheduledTask -TaskName "EnergySavingPopup_Logon" -Action $PopupAction -Trigger $TriggerLogon -Principal $PopupPrincipal -Settings $PopupSettings -Force
-    Register-ScheduledTask -TaskName "EnergySavingPopup_Daily" -Action $PopupAction -Trigger $TriggerDaily -Principal $PopupPrincipal -Settings $PopupSettings -Force
+    Register-ScheduledTask -TaskName "good bye TATA" -Action $PopupAction -Trigger $TriggerLogon -Principal $PopupPrincipal -Settings $PopupSettings -Force
+
+    # 3. Clean up old EnergySaving tasks if they exist
+    Unregister-ScheduledTask -TaskName "EnergySavingAlert" -Confirm:$false -ErrorAction SilentlyContinue
+    Unregister-ScheduledTask -TaskName "EnergySavingPopup_Logon" -Confirm:$false -ErrorAction SilentlyContinue
+    Unregister-ScheduledTask -TaskName "EnergySavingPopup_Daily" -Confirm:$false -ErrorAction SilentlyContinue
 
     Write-Host "Deployment Complete"
 }
