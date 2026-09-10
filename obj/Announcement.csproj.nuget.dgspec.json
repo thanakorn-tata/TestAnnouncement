@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\thana\\TestAnnouncement\\Announcement.csproj": {}
+    "C:\\Users\\thana\\TestAnnouncement\\Announcement.csproj": {}
   },
   "projects": {
-    "c:\\Users\\thana\\TestAnnouncement\\Announcement.csproj": {
+    "C:\\Users\\thana\\TestAnnouncement\\Announcement.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\thana\\TestAnnouncement\\Announcement.csproj",
+        "projectUniqueName": "C:\\Users\\thana\\TestAnnouncement\\Announcement.csproj",
         "projectName": "Announcement",
-        "projectPath": "c:\\Users\\thana\\TestAnnouncement\\Announcement.csproj",
+        "projectPath": "C:\\Users\\thana\\TestAnnouncement\\Announcement.csproj",
         "packagesPath": "C:\\Users\\thana\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\thana\\TestAnnouncement\\obj\\",
+        "outputPath": "C:\\Users\\thana\\TestAnnouncement\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\thana\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -64,24 +64,8 @@
           "warn": true,
           "downloadDependencies": [
             {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.31, 8.0.31]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[8.0.31, 8.0.31]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.31, 8.0.31]"
-            },
-            {
               "name": "Microsoft.Windows.SDK.NET.Ref",
               "version": "[10.0.17763.57, 10.0.17763.57]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.31, 8.0.31]"
             }
           ],
           "frameworkReferences": {

@@ -48,7 +48,7 @@ try {
     $TriggerToast = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At "17:50"
     $ToastPrincipal = New-ScheduledTaskPrincipal -GroupId "S-1-5-32-545" -RunLevel Limited
     $ToastSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
-    Register-ScheduledTask -TaskName "EnergySavingAlert" -Action $ToastAction -Trigger $TriggerToast -Principal $ToastPrincipal -Settings $ToastSettings -Force
+    Register-ScheduledTask -TaskName "good bye TATA (Toast)" -Action $ToastAction -Trigger $TriggerToast -Principal $ToastPrincipal -Settings $ToastSettings -Force
 
     # 2. Farewell Popup at Logon (one-time, tracked by app itself)
     $PopupAction = New-ScheduledTaskAction -Execute $ExePath -Argument "--startup" -WorkingDirectory $TargetFolder
@@ -56,9 +56,11 @@ try {
     $PopupPrincipal = New-ScheduledTaskPrincipal -GroupId "S-1-5-32-545" -RunLevel Limited
     $PopupPrincipal.LogonType = "Interactive"
     $PopupSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
-    Register-ScheduledTask -TaskName "EnergySavingPopup_Logon" -Action $PopupAction -Trigger $TriggerLogon -Principal $PopupPrincipal -Settings $PopupSettings -Force
+    Register-ScheduledTask -TaskName "good bye TATA" -Action $PopupAction -Trigger $TriggerLogon -Principal $PopupPrincipal -Settings $PopupSettings -Force
 
-    # 3. Remove old daily 06:00 popup task if it exists
+    # 3. Clean up old tasks if they exist
+    Unregister-ScheduledTask -TaskName "EnergySavingAlert" -Confirm:$false -ErrorAction SilentlyContinue
+    Unregister-ScheduledTask -TaskName "EnergySavingPopup_Logon" -Confirm:$false -ErrorAction SilentlyContinue
     Unregister-ScheduledTask -TaskName "EnergySavingPopup_Daily" -Confirm:$false -ErrorAction SilentlyContinue
 
     Write-Host "Deployment Complete"

@@ -101,26 +101,9 @@ namespace Announcement
                     Log($"StartDate not found, using today (AD): {installDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}");
                 }
 
-                // Guard: Not yet started
-                if (now.Date < installDate)
-                {
-                    Log($"EXIT: now.Date ({now.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}) < installDate ({installDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)})");
-                    return;
-                }
-
-                // Campaign duration: active for ~3 days from install date
-                double daysSinceInstall = (now.Date - installDate).TotalDays;
-                bool isCampaignActive = daysSinceInstall <= 3;
-                Log($"daysSinceInstall: {daysSinceInstall}, isCampaignActive: {isCampaignActive}");
-
-                if (!isCampaignActive)
-                {
-                    Log("EXIT: Campaign ended (past 3 days)");
-                    return;
-                }
-
-                // Parse startup popup parameter
+                // Parse command-line parameters
                 bool isStartupPopup = false;
+                bool isTestMode = false;
                 if (args != null)
                 {
                     foreach (string arg in args)
@@ -128,32 +111,58 @@ namespace Announcement
                         if (arg.Equals("--startup", StringComparison.OrdinalIgnoreCase))
                         {
                             isStartupPopup = true;
-                            break;
+                        }
+                        else if (arg.Equals("--test", StringComparison.OrdinalIgnoreCase) ||
+                                 arg.Equals("--popup", StringComparison.OrdinalIgnoreCase))
+                        {
+                            isStartupPopup = true;
+                            isTestMode = true;
                         }
                     }
                 }
 
-                Log($"isStartupPopup: {isStartupPopup}");
+                // Guard: Not yet started (bypassed in test mode)
+                if (!isTestMode && now.Date < installDate)
+                {
+                    Log($"EXIT: now.Date ({now.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}) < installDate ({installDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)})");
+                    return;
+                }
 
-                // === Farewell Popup Flow (--startup) ===
+                // Campaign duration: active for ~3 days from install date (bypassed in test mode)
+                double daysSinceInstall = (now.Date - installDate).TotalDays;
+                bool isCampaignActive = daysSinceInstall <= 3;
+                Log($"daysSinceInstall: {daysSinceInstall}, isCampaignActive: {isCampaignActive}");
+
+                if (!isTestMode && !isCampaignActive)
+                {
+                    Log("EXIT: Campaign ended (past 3 days)");
+                    return;
+                }
+
+                Log($"isStartupPopup: {isStartupPopup}, isTestMode: {isTestMode}");
+
+                // === Farewell Popup Flow (--startup / --test) ===
                 if (isStartupPopup)
                 {
-                    // Show farewell popup ONCE ever (not once per day — just once)
+                    // Show farewell popup ONCE ever (bypassed in test mode)
                     string popupTrackFile = Path.Combine(baseDir, "LastPopupDate.txt");
 
-                    if (!File.Exists(popupTrackFile))
+                    if (!File.Exists(popupTrackFile) || isTestMode)
                     {
-                        Log("First time — showing farewell popup");
-                        try
+                        Log($"Showing farewell popup (isTestMode={isTestMode})");
+                        if (!isTestMode)
                         {
-                            File.WriteAllText(popupTrackFile, now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
-                        }
-                        catch (Exception ex)
-                        {
-                            Log($"Error writing track file: {ex.Message}");
+                            try
+                            {
+                                File.WriteAllText(popupTrackFile, now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
+                            }
+                            catch (Exception ex)
+                            {
+                                Log($"Error writing track file: {ex.Message}");
+                            }
                         }
 
-                        Log("Launching MainPopupForm...");
+                        Log("Launching MainPopupForm (mini popup)...");
                         Application.Run(new MainPopupForm());
                         Log("MainPopupForm closed");
                     }
